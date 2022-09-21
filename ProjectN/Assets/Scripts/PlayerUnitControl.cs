@@ -5,27 +5,17 @@ using UnityEngine.Tilemaps;
 
 public class PlayerUnitControl : MobBase
 {
-    GridLayout gridLayout;
-    bool isMoving = false;
     void Update()
     {
-        gridLayout = transform.parent.GetComponent<GridLayout>();
-        UnitMovement();
+        UnitControl();
     }
-
-    Vector3 targetPos = new Vector3();
-    protected override void UnitMovement()
+    protected void UnitControl()
     {
-        Tilemap tileMap;
-        Vector3Int cellPosition;
-        if (Input.GetMouseButtonUp(0))
+        if (Input.GetMouseButtonUp(0) && mapManager.isWalkable(Camera.main.ScreenToWorldPoint(Input.mousePosition)) && !isMoving)
         {
             isMoving = true;
-            tileMap = GameObject.FindGameObjectWithTag("Floor").GetComponent<Tilemap>();
-            cellPosition = tileMap.WorldToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
-
-            targetPos = tileMap.GetCellCenterWorld(cellPosition);
+            Vector3Int cellPosition = tileMap.WorldToCell(Camera.main.ScreenToWorldPoint(Input.mousePosition));
+            StartCoroutine(UnitMovement(PathCalc(cellPosition)));
         }
-        if (isMoving && transform.position != targetPos) transform.position = Vector2.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
     }
 }
